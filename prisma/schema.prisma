@@ -15,7 +15,7 @@ datasource db {
 
 // event model
 model Event {
-  id Int @id @default(autoincrement())
+  id Int @id @unique @default(autoincrement())
   date Int
   month String
   heading String
@@ -32,13 +32,14 @@ model staff {
   id Int @id @default(autoincrement())
   employeeId String
   name String
-  email String
+  email String @unique
   password String
   phone String
   designation String
   address String
   joinDate String
   role String
+  blood String
 }
 
 // Student table
@@ -46,7 +47,7 @@ model student {
   id Int @id @default(autoincrement())
   studentId String
   name String
-  email String
+  email String @unique
   password String
   phone String
   courseEnrolled String

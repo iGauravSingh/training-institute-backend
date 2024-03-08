@@ -11,6 +11,8 @@ app.use(express.urlencoded({ extended: false }));
 app.get('/',(req,res) => {
     res.send('hello from server')
 })
+// auth routes
+app.use('/auth', require('./routes/authRoutes'))
 // event routes 
 app.use('/events',require('./routes/eventRoutes'))
 // staff routes
@@ -31,7 +33,7 @@ app.use((req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

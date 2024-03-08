@@ -39,10 +39,12 @@ const getOneEvent = asyncHandler(async (req,res)=> {
 
 //// create event
 const createEvent = asyncHandler(async (req,res)=>{
+    console.log('in event controller create event')
     const {date,month,heading,venue,state,city,detail,timeStart,timeEnd} = req.body;
+    const newDate = parseInt(date)
     const newevent = await prisma.Event.create({
         data: {
-            date,
+            date: newDate,
             month,
             heading,
             venue,
@@ -53,18 +55,20 @@ const createEvent = asyncHandler(async (req,res)=>{
             timeEnd
         }
     })
-    res.json({created: "ok"})
+    res.json({message: "ok created"})
 })
 
 //// delete event
 const deleteEvent = asyncHandler(async (req,res)=> {
-    const {id} = req.body
+    const id = parseInt(req.params.id, 10)
+    //console.log('in event controller delete event here is req.body', id)
+    
     const deleteEvent = await prisma.Event.delete({
         where: {
             id: id
         }
     })
-    res.send('entry deleted')
+    res.send({message: 'deleted'})
 })
 
 

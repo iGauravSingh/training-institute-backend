@@ -1,38 +1,52 @@
-// const jwt = require('jsonwebtoken');
-// const bcrypt = require('bcryptjs');
-// const fs = require('fs');
-// const path = require('path');
+const JWT = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const asyncHandler = require("express-async-handler");
+const { prisma } = require("../db");
 
-// const adminsFilePath = path.join(__dirname, 'admins.json');
+// Authenticate user and generate JWT token
+const login = asyncHandler(async (req,res) => {
+    const { email, password } = req.body;
+
+  const user = await prisma.staff.findUnique({
+    where: {
+        email
+    }
+  });
+
+  if (!user) {
+    return res.status(400).json({
+      errors: [{ msg: "Invalid Credentials" }],
+    });
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    return res.status(400).json({
+      errors: [{ msg: "Invalid Credentials" }],
+    });
+  }
+
+  //console.log(user)
+    const userPayload = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      }
+  const token = await JWT.sign(
+    userPayload,
+    process.env.JSON_WEB_TOKEN_SECRET,
+    {
+      expiresIn: 3600000,
+    }
+  );
+  return res.json({
+    user: userPayload,
+    token,
+  });
+})
+  
 
 
-// // Helper function to read admins from the JSON file
-// function readAdminsFromFile() {
-//     try {
-//         const data = fs.readFileSync(adminsFilePath, 'utf8');
-//         return JSON.parse(data);
-//     } catch (err) {
-//         return [];
-//     }
-// }
-
-// // Authenticate user and generate JWT token
-// const login = asyncHandler(async (req,res)=>{
-//     const { username, password } = req.body;
-//     const admins = readAdminsFromFile();
-//     const user = admins.find(admin => admin.username === username);
-//     if (!user) {
-//         return res.status(401).json({ message: 'Authentication failed' });
-//     }
-//     bcrypt.compare(password, user.password, (err, result) => {
-//         if (err || !result) {
-//             return res.status(401).json({ message: 'Authentication failed' });
-//         }
-//         const token = jwt.sign({ username: user.username, email: user.email }, 'your_secret_key', { expiresIn: '1h' });
-//         res.json({ token });
-//     });
-// })
-
-
-// module.exports = { login }
+module.exports = { login }
 
