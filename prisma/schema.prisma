@@ -25,6 +25,7 @@ model Event {
   detail String
   timeStart String
   timeEnd String
+  createdAt DateTime @default(now())
 }
 
 // staff table

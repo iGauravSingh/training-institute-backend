@@ -14,14 +14,12 @@ const getAllEvent = asyncHandler(async (req,res)=> {
 })
 
 //// get eone event detail
-const getOneEvent = asyncHandler(async (req,res)=> {
+const getFiveEvent = asyncHandler(async (req,res)=> {
     const id = parseInt(req.params.id, 10)
     try {
         
-        const oneEvent = await prisma.event.findUnique({
-            where: {
-              id: id, 
-            },
+        const oneEvent = await prisma.event.findMany({
+            take: id
           });
       
           if (oneEvent) {
@@ -73,7 +71,7 @@ const deleteEvent = asyncHandler(async (req,res)=> {
 
 
 module.exports = {
-    getAllEvent, createEvent, deleteEvent, getOneEvent
+    getAllEvent, createEvent, deleteEvent, getFiveEvent
 }
 
 ///////////////////////////////////
