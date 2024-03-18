@@ -1,11 +1,17 @@
 const JWT = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 const asyncHandler = require("express-async-handler");
+const { validationResult } = require('express-validator');
+
 const { prisma } = require("../db");
 
 // Authenticate user and generate JWT token
 const login = asyncHandler(async (req,res) => {
     const { email, password } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
     try {
       const user = await prisma.staff.findUnique({
@@ -49,8 +55,41 @@ const login = asyncHandler(async (req,res) => {
       console.log('error in auth',error)
     }
 })
-  
+
+const changePassword = asyncHandler(async (req,res) => {
+  const { password } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
 
-module.exports = { login }
+    //Hash the new password
+    const saltRounds = 10; // You can adjust the number of salt rounds as needed
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // console.log('from cahnge apsswpowd',req.user)
+    // res.send('change password')
+    try {
+      const updatedUser = await prisma.staff.update({
+          where: {
+              email: req.user.email
+          },
+          data: {
+              password: hashedPassword
+          }
+      });
+      
+      // 4. Return a response indicating success
+      return res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+      // Handle any potential errors
+    console.error("Error updating password:", error);
+    return res.status(500).json({ errors: [{ msg: "Internal server error" }] });
+    }
+
+})
+
+
+module.exports = { login, changePassword }
 
