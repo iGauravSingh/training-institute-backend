@@ -8,15 +8,20 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get('/',(req,res) => {
-    res.send('hello from server')
-})
+// app.get('/',(req,res) => {
+//     res.send('hello from server')
+// })
+
+// app.use((req,res,next)=> {
+//     console.log('from backend')
+//     next()
+// })
 // auth routes
 app.use('/auth', require('./routes/authRoutes'))
 // event routes 
 app.use('/events',require('./routes/eventRoutes'))
 // staff routes
-app.use('/staff',require('./routes/staffRoutes'))
+// app.use('/staff',require('./routes/staffRoutes'))
 
 // auth routes
 // app.use('/login',require('./routes/authRoutes'))

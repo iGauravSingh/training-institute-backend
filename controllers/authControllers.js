@@ -7,43 +7,47 @@ const { prisma } = require("../db");
 const login = asyncHandler(async (req,res) => {
     const { email, password } = req.body;
 
-  const user = await prisma.staff.findUnique({
-    where: {
-        email
-    }
-  });
-
-  if (!user) {
-    return res.status(400).json({
-      errors: [{ msg: "Invalid Credentials" }],
-    });
-  }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    return res.status(400).json({
-      errors: [{ msg: "Invalid Credentials" }],
-    });
-  }
-
-  //console.log(user)
-    const userPayload = {
-        id: user.id,
-        email: user.email,
-        username: user.username,
+    try {
+      const user = await prisma.staff.findUnique({
+        where: {
+            email
+        }
+      });
+    
+      if (!user) {
+        return res.status(400).json({
+          errors: [{ msg: "Invalid Credentials" }],
+        });
       }
-  const token = await JWT.sign(
-    userPayload,
-    process.env.JSON_WEB_TOKEN_SECRET,
-    {
-      expiresIn: 3600000,
+    
+      const isMatch = await bcrypt.compare(password, user.password);
+    
+      if (!isMatch) {
+        return res.status(400).json({
+          errors: [{ msg: "Invalid Credentials" }],
+        });
+      }
+    
+      //console.log(user)
+        const userPayload = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+          }
+      const token = await JWT.sign(
+        userPayload,
+        process.env.JSON_WEB_TOKEN_SECRET,
+        {
+          expiresIn: 3600000,
+        }
+      );
+      return res.json({
+        user: userPayload,
+        token,
+      });
+    } catch (error) {
+      console.log('error in auth',error)
     }
-  );
-  return res.json({
-    user: userPayload,
-    token,
-  });
 })
   
 

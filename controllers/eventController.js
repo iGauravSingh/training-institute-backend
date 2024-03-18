@@ -9,51 +9,39 @@ const { prisma } = require("../db");
 
 //// get all routes
 const getAllEvent = asyncHandler(async (req,res)=> {
-    const allevent = await prisma.Event.findMany()
+    try {
+        const allevent = await prisma.Event.findMany()
     res.send(allevent)
+    } catch (error) {
+        console.log('error connecting database in getting all',error)
+    }
 })
 
-//// get eone event detail
-const getFiveEvent = asyncHandler(async (req,res)=> {
-    const id = parseInt(req.params.id, 10)
-    try {
-        
-        const oneEvent = await prisma.event.findMany({
-            take: id
-          });
-      
-          if (oneEvent) {
-            res.send(oneEvent)
-          } else {
-            res.send('event not found')
-          }
-    
-    } catch (error) {
-        res.send('some error ')
-    } finally {
-        await prisma.$disconnect();
-      }
-})
+
 
 //// create event
 const createEvent = asyncHandler(async (req,res)=>{
-    console.log('in event controller create event')
+    //console.log('in event controller create event')
     const {date,month,heading,venue,state,city,detail,timeStart,timeEnd} = req.body;
     const newDate = parseInt(date)
-    const newevent = await prisma.Event.create({
-        data: {
-            date: newDate,
-            month,
-            heading,
-            venue,
-            state,
-            city,
-            detail,
-            timeStart,
-            timeEnd
-        }
-    })
-    res.json({message: "ok created"})
+    try {
+        const newevent = await prisma.Event.create({
+            data: {
+                date: newDate,
+                month,
+                heading,
+                venue,
+                state,
+                city,
+                detail,
+                timeStart,
+                timeEnd
+            }
+        })
+        res.json({message: "ok created"})
+    } catch (error) {
+        console.log('error connecting database in creating',error)
+    }
 })
 
 //// delete event
@@ -61,17 +49,21 @@ const deleteEvent = asyncHandler(async (req,res)=> {
     const id = parseInt(req.params.id, 10)
     //console.log('in event controller delete event here is req.body', id)
     
-    const deleteEvent = await prisma.Event.delete({
-        where: {
-            id: id
-        }
-    })
-    res.send({message: 'deleted'})
+    try {
+        const deleteEvent = await prisma.Event.delete({
+            where: {
+                id: id
+            }
+        })
+        res.send({message: 'deleted'})
+    } catch (error) {
+        console.log('error connecting database in deleting',error)
+    }
 })
 
 
 module.exports = {
-    getAllEvent, createEvent, deleteEvent, getFiveEvent
+    getAllEvent, createEvent, deleteEvent
 }
 
 ///////////////////////////////////
